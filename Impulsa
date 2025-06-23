@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colección IMPULSA</title>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Trebuchet+MS:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root{
+  --color-primary:#EF7B15;
+  --color-secondary:#073B5B;
+  --color-tertiary:#3C235A;
+  --color-accent:#D65215;
+  --color-light:#F9F9F9;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+ font-family:'Trebuchet MS', sans-serif;
+ background:var(--color-light);
+ color:var(--color-secondary);
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ min-height:100vh;
+ padding:2rem 1rem 4rem;
+}
+
+header{
+ text-align:center;
+ position:relative;
+ max-width:100%;
+}
+
+h1{
+ font-size:clamp(1.9rem,4vw,2.6rem);
+ color:var(--color-primary);
+}
+
+h2{
+ font-size:clamp(1rem,2.2vw,1.2rem);
+ font-weight:400;
+ margin-top:1rem;
+ max-width:42rem;
+ line-height:1.4;
+}
+
+.board-decor{
+ position:absolute;
+ width:56px;
+ height:56px;
+ border-radius:12px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:1.7rem;
+ color:#fff;
+}
+.board-decor.rocket{background:var(--color-primary); top:-20px; left:-20px; transform:rotate(-6deg);}
+.board-decor.bulb{background:var(--color-tertiary); top:-20px; right:-20px; transform:rotate(4deg);}
+
+/* ---  Responsive grid  --- */
+.container{
+ display:grid;
+ gap:1.2rem;
+ width:100%;
+ max-width:920px;
+ grid-template-columns:repeat(auto-fit,minmax(min(160px,45%),1fr));
+ margin-top:2rem;
+}
+
+.drop-zone{
+ background:#fff;
+ border:3px dashed var(--color-secondary);
+ border-radius:16px;
+ position:relative;
+ cursor:pointer;
+ aspect-ratio:1/1; /* cuadrado fluido */
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ transition:border-color 0.3s, background 0.3s;
+}
+.drop-zone:hover{background:#fafafa;}
+.drop-zone.filled{border-style:solid;}
+.drop-zone img{width:80%; height:80%; object-fit:contain;}
+.drop-zone span{color:var(--color-secondary); text-align:center; padding:0 0.5rem;}
+
+#uploadBtn{
+ margin:2rem 0;
+ padding:0.9rem 3rem;
+ font-size:clamp(0.9rem,2.2vw,1.1rem);
+ background:var(--color-secondary);
+ color:#fff;
+ border:none;
+ border-radius:50px;
+ cursor:pointer;
+ transition:background 0.25s, transform 0.25s;
+}
+#uploadBtn:disabled{opacity:.4; cursor:not-allowed;}
+#uploadBtn:not(:disabled):hover{background:var(--color-tertiary); transform:translateY(-3px);}
+
+/* Overlay */
+#overlay{
+ position:fixed; inset:0;
+ background:rgba(0,0,0,0.7);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ opacity:0; visibility:hidden;
+ transition:opacity 0.4s;
+ z-index:1000;
+}
+#overlay.show{opacity:1; visibility:visible;}
+.message-box{
+ background:#fff;
+ color:var(--color-secondary);
+ width:90%;
+ max-width:500px;
+ padding:2rem 1.5rem;
+ border-radius:24px;
+ text-align:center;
+ animation:pop 0.6s ease-out;
+}
+@keyframes pop{from{transform:scale(.8);opacity:0;} to{transform:scale(1);opacity:1;}}
+.message-box h3{font-size:1.6rem; color:var(--color-primary); margin-bottom:1rem;}
+.message-box p{margin:1rem 0; line-height:1.4;}
+</style>
+</head>
+<body>
+<header>
+  <div class="board-decor rocket"><i class="fas fa-rocket"></i></div>
+  <div class="board-decor bulb"><i class="fas fa-lightbulb"></i></div>
+  <h1>Colección IMPULSA</h1>
+  <h2>Arrastra o selecciona tus 4 stickers coleccionables en los espacios señalados. Cuando los cuatro se hayan cargado correctamente, descubrirás la sorpresa exclusiva que hemos preparado para ti.</h2>
+</header>
+
+<section class="container">
+  <div class="drop-zone" data-index="0"><span>Sticker&nbsp;1</span></div>
+  <div class="drop-zone" data-index="1"><span>Sticker&nbsp;2</span></div>
+  <div class="drop-zone" data-index="2"><span>Sticker&nbsp;3</span></div>
+  <div class="drop-zone" data-index="3"><span>Sticker&nbsp;4</span></div>
+</section>
+
+<input type="file" id="fileInput" accept="image/*" multiple hidden>
+<button id="uploadBtn" disabled>Revela tu mensaje</button>
+
+<div id="overlay">
+  <div class="message-box">
+    <h3>🎉🚀 ¡Misión cumplida!</h3>
+    <p>Has reunido los 4 símbolos del cambio, y con ellos desbloqueaste un mensaje reservado solo para quienes se atreven a llegar más lejos:</p>
+    <p><strong>✨ "En IMPULSA innovamos para el futuro."</strong></p>
+    <p>Tú eres parte de esta transformación.<br>
+    Gracias por ser pionero, por romper paradigmas, por apostar al futuro y por conquistar juntos la transformación.</p>
+    <p>🌍 Bienvenido a la <strong>Salida en vivo</strong> del <strong>ROLLOUT 3.</strong><br>
+    📅 Nos vemos el <strong>4 de julio.</strong><br>
+    Prepárate para lo que viene. Esto apenas comienza.</p>
+  </div>
+</div>
+
+<script>
+const dzs       = document.querySelectorAll('.drop-zone');
+const fileInput = document.getElementById('fileInput');
+const btn       = document.getElementById('uploadBtn');
+const overlay   = document.getElementById('overlay');
+let filesData   = Array(4).fill(null);
+
+// Helper to preview and store
+function handleFile(file, idx){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e =>{
+    dzs[idx].innerHTML = `<img src="${e.target.result}" alt="Sticker ${idx+1}">`;
+    dzs[idx].classList.add('filled');
+    dzs[idx].style.borderColor='var(--color-primary)';
+    filesData[idx]=file;
+    btn.disabled = !filesData.every(f=>f);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Events
+ dzs.forEach((dz,i)=>{
+  dz.addEventListener('click', ()=>{fileInput.dataset.idx=i; fileInput.click();});
+  dz.addEventListener('dragover',e=>{e.preventDefault(); dz.style.borderColor='var(--color-primary)';});
+  dz.addEventListener('dragleave',()=>{dz.style.borderColor='var(--color-secondary)';});
+  dz.addEventListener('drop',e=>{e.preventDefault(); handleFile(e.dataTransfer.files[0],i);} );
+ });
+ fileInput.addEventListener('change',e=>{
+   const i = parseInt(fileInput.dataset.idx ?? -1);
+   if(i>-1){handleFile(e.target.files[0],i);} else {
+     Array.from(e.target.files).slice(0,4).forEach((f,idx)=>handleFile(f,idx));
+   }
+   fileInput.value='';
+ });
+
+function launchConfetti(){
+  const end = Date.now()+3500;
+  const defaults={startVelocity:30,spread:360,ticks:60,zIndex:2100,colors:['#EF7B15','#D65215','#073B5B','#3C235A']};
+  function rand(min,max){return Math.random()*(max-min)+min;}
+  const int=setInterval(()=>{
+    if(Date.now()>end){clearInterval(int);return;}
+    confetti({...defaults,particleCount:40,origin:{x:rand(0.1,0.3),y:Math.random()-0.2}});
+    confetti({...defaults,particleCount:40,origin:{x:rand(0.7,0.9),y:Math.random()-0.2}});
+  },250);
+}
+
+btn.addEventListener('click',()=>{
+  if(btn.disabled) return;
+  overlay.classList.add('show');
+  launchConfetti();
+});
+</script>
+</body>
+</html>
